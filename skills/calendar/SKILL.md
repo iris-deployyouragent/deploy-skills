@@ -1,6 +1,8 @@
 ---
 name: calendar
-description: Manage calendar events across Google Calendar or Outlook Calendar. Schedule meetings, check availability, set reminders, find free slots, and manage recurring events. Use for any scheduling task including booking meetings, checking what's on today, finding available times, or setting up reminders.
+description: Manage calendar events across Google Calendar or Outlook. Schedule meetings, check availability, set reminders, find free slots. Use when user needs to check schedule, book meetings, find available times, or manage calendar.
+homepage: https://developers.google.com/calendar
+metadata: {"clawdbot":{"emoji":"📅","requires":{"env":["GOOGLE_CALENDAR_TOKEN","OUTLOOK_CALENDAR_TOKEN"]},"primaryEnv":"GOOGLE_CALENDAR_TOKEN"}}
 ---
 
 # Calendar Management

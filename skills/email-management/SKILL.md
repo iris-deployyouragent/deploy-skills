@@ -1,6 +1,8 @@
 ---
 name: email-management
-description: Manage emails across Gmail, Outlook, or IMAP providers. Read inbox, compose/send emails, organize with labels/folders, search messages, draft responses, and handle attachments. Use for any email-related task including checking unread messages, sending replies, organizing inbox, or drafting professional correspondence.
+description: Manage emails across Gmail, Outlook, or IMAP providers. Read inbox, compose/send emails, organize with labels/folders, search messages, draft responses. Use when user asks to check email, send messages, find emails, organize inbox, or draft professional correspondence.
+homepage: https://developers.google.com/gmail/api
+metadata: {"clawdbot":{"emoji":"📧","requires":{"env":["GMAIL_CLIENT_ID","GMAIL_CLIENT_SECRET","OUTLOOK_CLIENT_ID"]},"primaryEnv":"GMAIL_CLIENT_ID"}}
 ---
 
 # Email Management

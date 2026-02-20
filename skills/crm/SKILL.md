@@ -1,6 +1,8 @@
 ---
 name: crm
-description: Manage customer relationships with HubSpot, Salesforce, or Deploy CRM. Track leads, manage deals, log interactions, automate follow-ups, and analyze sales pipeline. Use for any sales task including adding leads, updating deal stages, logging calls/meetings, checking pipeline status, or planning follow-ups.
+description: Manage customer relationships with HubSpot, Salesforce, or Deploy CRM. Track leads, manage deals, log interactions, check pipeline status. Use for sales tasks, lead management, deal tracking, logging calls/meetings, or pipeline review.
+homepage: https://developers.hubspot.com/docs/api/overview
+metadata: {"clawdbot":{"emoji":"🤝","requires":{"env":["HUBSPOT_API_KEY","SALESFORCE_ACCESS_TOKEN"]},"primaryEnv":"HUBSPOT_API_KEY"}}
 ---
 
 # CRM & Sales

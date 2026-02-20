@@ -1,6 +1,8 @@
 ---
 name: customer-service
-description: Handle customer support across Zendesk, Freshdesk, or email. Manage tickets, respond to inquiries, escalate issues, track satisfaction, and maintain FAQ responses. Use for support tasks including answering customer questions, creating/updating tickets, checking ticket status, or handling complaints.
+description: Handle customer support via Zendesk, Freshdesk, or email. Manage tickets, respond to inquiries, escalate issues, track satisfaction. Use for support tasks, ticket management, answering customer questions, or drafting responses.
+homepage: https://developer.zendesk.com
+metadata: {"clawdbot":{"emoji":"🎧","requires":{"env":["ZENDESK_API_KEY","FRESHDESK_API_KEY"]},"primaryEnv":"ZENDESK_API_KEY"}}
 ---
 
 # Customer Service

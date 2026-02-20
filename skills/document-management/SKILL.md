@@ -1,6 +1,8 @@
 ---
 name: document-management
-description: Manage documents with Google Drive, OneDrive, or Dropbox. Upload, organize, search, share files, and manage permissions. Use for any file task including finding documents, uploading files, creating folders, sharing with team members, or organizing file structures.
+description: Manage documents with Google Drive, OneDrive, or Dropbox. Upload, organize, search, share files. Use for finding documents, uploading files, sharing, creating folders, or organizing file structures.
+homepage: https://developers.google.com/drive
+metadata: {"clawdbot":{"emoji":"📁","requires":{"env":["GOOGLE_DRIVE_TOKEN","ONEDRIVE_TOKEN"]},"primaryEnv":"GOOGLE_DRIVE_TOKEN"}}
 ---
 
 # Document Management

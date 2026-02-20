@@ -1,6 +1,8 @@
 ---
 name: invoicing
-description: Manage invoicing and payments with Xero, QuickBooks, or generic templates. Create invoices, track payments, send reminders, reconcile accounts, and generate financial reports. Use for any billing task including creating invoices, checking unpaid invoices, sending payment reminders, or reconciling payments.
+description: Manage invoicing with Xero, QuickBooks, or generic templates. Create invoices, track payments, send reminders, reconcile accounts. Use for billing tasks, creating invoices, checking unpaid invoices, or payment follow-ups.
+homepage: https://developer.xero.com/documentation
+metadata: {"clawdbot":{"emoji":"💰","requires":{"env":["XERO_CLIENT_ID","QUICKBOOKS_CLIENT_ID"]},"primaryEnv":"XERO_CLIENT_ID"}}
 ---
 
 # Invoicing & Payments

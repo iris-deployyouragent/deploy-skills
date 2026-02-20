@@ -1,6 +1,8 @@
 ---
 name: inventory
-description: Manage inventory with Shopify, WooCommerce, or generic tracking. Track stock levels, set reorder alerts, manage products, coordinate with suppliers. Use for any inventory task including checking stock, updating quantities, creating products, setting low-stock alerts, or generating inventory reports.
+description: Manage inventory with Shopify, WooCommerce, or generic tracking. Track stock levels, set reorder alerts, manage products. Use for stock checks, updating quantities, low-stock alerts, or inventory reports.
+homepage: https://shopify.dev/docs/api
+metadata: {"clawdbot":{"emoji":"📦","requires":{"env":["SHOPIFY_ACCESS_TOKEN","WOOCOMMERCE_KEY"]},"primaryEnv":"SHOPIFY_ACCESS_TOKEN"}}
 ---
 
 # Inventory Management
