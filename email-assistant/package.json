@@ -1,0 +1,27 @@
+{
+  "name": "email-assistant",
+  "version": "1.0.0",
+  "description": "AI-powered email management skill for Clawdbot",
+  "main": "scripts/check-inbox.js",
+  "scripts": {
+    "check": "node scripts/check-inbox.js",
+    "draft": "node scripts/draft-reply.js",
+    "send": "node scripts/send-email.js send",
+    "verify": "node scripts/send-email.js verify",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "clawdbot",
+    "email",
+    "automation",
+    "gmail",
+    "ai-assistant"
+  ],
+  "author": "Deploy Your Agent",
+  "license": "MIT",
+  "dependencies": {
+    "imap": "^0.8.19",
+    "mailparser": "^3.7.1",
+    "nodemailer": "^6.9.16"
+  }
+}

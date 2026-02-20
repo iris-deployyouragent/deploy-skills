@@ -1,0 +1,17 @@
+{
+  "email": "",
+  "appPassword": "",
+  "checkInterval": 15,
+  "categories": {
+    "urgent": ["urgent", "asap", "deadline", "important", "critical", "emergency"],
+    "client": ["inquiry", "quote", "booking", "interested", "pricing", "services", "consultation"],
+    "admin": ["receipt", "invoice", "notification", "automated", "noreply", "confirmation"],
+    "spam": ["unsubscribe", "newsletter", "promo", "sale", "discount"]
+  },
+  "autoArchive": ["newsletter", "promo", "marketing"],
+  "notifyChannel": "telegram",
+  "notifyOnCategories": ["urgent", "client"],
+  "draftRepliesFor": ["client"],
+  "businessName": "Deploy Your Agent",
+  "signature": "\n\nBest,\nThe Deploy Team"
+}
