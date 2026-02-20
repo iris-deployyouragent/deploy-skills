@@ -1,0 +1,95 @@
+{
+  "skills": [
+    {
+      "id": "email-management",
+      "name": "Email Management",
+      "description": "Read, compose, organize, and respond to emails automatically",
+      "variants": ["gmail", "outlook", "imap"],
+      "category": "communication",
+      "requiredCredentials": {
+        "gmail": ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"],
+        "outlook": ["MICROSOFT_CLIENT_ID", "MICROSOFT_CLIENT_SECRET"],
+        "imap": ["IMAP_HOST", "IMAP_PORT", "IMAP_USER", "IMAP_PASSWORD", "SMTP_HOST", "SMTP_PORT"]
+      }
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar Management",
+      "description": "Schedule meetings, manage events, check availability, send reminders",
+      "variants": ["google", "outlook"],
+      "category": "productivity",
+      "requiredCredentials": {
+        "google": ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"],
+        "outlook": ["MICROSOFT_CLIENT_ID", "MICROSOFT_CLIENT_SECRET"]
+      }
+    },
+    {
+      "id": "customer-service",
+      "name": "Customer Service",
+      "description": "Handle support tickets, answer FAQs, escalate issues, track satisfaction",
+      "variants": ["zendesk", "freshdesk", "email"],
+      "category": "support",
+      "requiredCredentials": {
+        "zendesk": ["ZENDESK_SUBDOMAIN", "ZENDESK_EMAIL", "ZENDESK_API_TOKEN"],
+        "freshdesk": ["FRESHDESK_DOMAIN", "FRESHDESK_API_KEY"],
+        "email": []
+      }
+    },
+    {
+      "id": "invoicing",
+      "name": "Invoicing & Payments",
+      "description": "Generate invoices, track payments, send reminders, reconcile accounts",
+      "variants": ["xero", "quickbooks", "generic"],
+      "category": "finance",
+      "requiredCredentials": {
+        "xero": ["XERO_CLIENT_ID", "XERO_CLIENT_SECRET"],
+        "quickbooks": ["QUICKBOOKS_CLIENT_ID", "QUICKBOOKS_CLIENT_SECRET"],
+        "generic": []
+      }
+    },
+    {
+      "id": "crm",
+      "name": "CRM & Sales",
+      "description": "Manage leads, track deals, log interactions, automate follow-ups",
+      "variants": ["hubspot", "salesforce", "deploy-crm"],
+      "category": "sales",
+      "requiredCredentials": {
+        "hubspot": ["HUBSPOT_API_KEY"],
+        "salesforce": ["SALESFORCE_CLIENT_ID", "SALESFORCE_CLIENT_SECRET", "SALESFORCE_INSTANCE_URL"],
+        "deploy-crm": ["SUPABASE_URL", "SUPABASE_KEY"]
+      }
+    },
+    {
+      "id": "inventory",
+      "name": "Inventory Management",
+      "description": "Track stock levels, reorder alerts, product management, supplier coordination",
+      "variants": ["shopify", "woocommerce", "generic"],
+      "category": "operations",
+      "requiredCredentials": {
+        "shopify": ["SHOPIFY_STORE_URL", "SHOPIFY_ACCESS_TOKEN"],
+        "woocommerce": ["WOOCOMMERCE_URL", "WOOCOMMERCE_KEY", "WOOCOMMERCE_SECRET"],
+        "generic": []
+      }
+    },
+    {
+      "id": "document-management",
+      "name": "Document Management",
+      "description": "Organize files, search documents, share securely, version control",
+      "variants": ["google-drive", "onedrive", "dropbox"],
+      "category": "productivity",
+      "requiredCredentials": {
+        "google-drive": ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"],
+        "onedrive": ["MICROSOFT_CLIENT_ID", "MICROSOFT_CLIENT_SECRET"],
+        "dropbox": ["DROPBOX_ACCESS_TOKEN"]
+      }
+    }
+  ],
+  "categories": {
+    "communication": "Email, messaging, notifications",
+    "productivity": "Calendar, documents, task management",
+    "support": "Customer service, helpdesk, ticketing",
+    "finance": "Invoicing, payments, accounting",
+    "sales": "CRM, leads, pipeline management",
+    "operations": "Inventory, orders, logistics"
+  }
+}

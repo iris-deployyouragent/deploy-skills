@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "lastUpdated": "2026-02-20",
+  "skills": {
+    "email-management": "1.0.0",
+    "calendar": "1.0.0",
+    "customer-service": "1.0.0",
+    "invoicing": "1.0.0",
+    "crm": "1.0.0",
+    "inventory": "1.0.0",
+    "document-management": "1.0.0"
+  }
+}
