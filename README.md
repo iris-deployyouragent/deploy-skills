@@ -2,6 +2,8 @@
 
 Modular skill library for Deploy Your Agent installations.
 
+> **📘 Full Setup Guide:** See [SETUP.md](./SETUP.md) for complete installation and credential setup instructions.
+
 ## Quick Start
 
 ```bash
