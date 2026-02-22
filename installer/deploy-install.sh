@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Deploy Your Agent - Skill Installer
-# Interactive installer for client agent setups
+# Deploy Your Agent - Skill Installer v2
+# Install curated skill packages for different business types
 
 set -e
 
@@ -12,284 +12,383 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 BOLD='\033[1m'
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_DIR="$(dirname "$SCRIPT_DIR")/skills"
-REGISTRY_FILE="$(dirname "$SCRIPT_DIR")/registry/skills.json"
 
-# Installation tracking
-INSTALLED_SKILLS=()
-ENV_VARS=()
+# ============================================
+# SKILL PACKAGES BY BUSINESS TYPE
+# ============================================
 
-# Banner
+# Core skills every client gets
+CORE_SKILLS=(
+    "self-improvement"
+    "proactive-agent"
+    "memory-setup"
+    "gog"
+    "remind-me"
+    "summarize"
+    "agent-browser"
+)
+
+# Service business (plumber, electrician, cleaner, etc.)
+SERVICE_SKILLS=(
+    "calendar"
+    "invoicing"
+    "customer-service"
+    "email-management"
+    "morning-email-rollup"
+    "apple-reminders"
+)
+
+# E-commerce business
+ECOMMERCE_SKILLS=(
+    "stripe"
+    "inventory"
+    "shopping-expert"
+    "pinch-to-post"
+    "invoice-generator"
+    "customer-service"
+    "n8n"
+)
+
+# Agency / Consulting
+AGENCY_SKILLS=(
+    "hubspot"
+    "crm"
+    "linkedin-monitor"
+    "linkedin-inbox"
+    "pptx-creator"
+    "ai-pdf-builder"
+    "marketing-mode"
+    "daily-review"
+)
+
+# Content Creator
+CREATOR_SKILLS=(
+    "twitter"
+    "instagram"
+    "youtube-watcher"
+    "marketing-mode"
+    "de-ai-ify"
+    "deep-research"
+)
+
+# Professional Services (lawyer, accountant, consultant)
+PROFESSIONAL_SKILLS=(
+    "calendar"
+    "document-management"
+    "excel"
+    "ai-pdf-builder"
+    "ga4-analytics"
+    "todoist"
+    "linear"
+    "focus-deep-work"
+)
+
+# All skills
+ALL_SKILLS=(
+    "agentmail"
+    "ai-pdf-builder"
+    "apple-reminders"
+    "agent-browser"
+    "calendar"
+    "compound-engineering"
+    "crm"
+    "customer-service"
+    "daily-review"
+    "de-ai-ify"
+    "deep-research"
+    "document-management"
+    "email-management"
+    "event-planner"
+    "excel"
+    "focus-deep-work"
+    "ga4-analytics"
+    "gog"
+    "hubspot"
+    "instagram"
+    "inventory"
+    "invoice-generator"
+    "invoicing"
+    "linear"
+    "linkedin-inbox"
+    "linkedin-monitor"
+    "marketing-mode"
+    "memory-setup"
+    "morning-email-rollup"
+    "n8n"
+    "pinch-to-post"
+    "pptx-creator"
+    "proactive-agent"
+    "remind-me"
+    "self-improvement"
+    "shopping-expert"
+    "stripe"
+    "summarize"
+    "todoist"
+    "twitter"
+    "youtube-watcher"
+)
+
+# ============================================
+# FUNCTIONS
+# ============================================
+
 print_banner() {
     echo -e "${PURPLE}"
     echo "╔═══════════════════════════════════════════════════════════════╗"
     echo "║                                                               ║"
-    echo "║        🚀 Deploy Your Agent - Skill Installer 🚀              ║"
+    echo "║        🚀 Deploy Your Agent - Skill Installer v2 🚀           ║"
     echo "║                                                               ║"
     echo "╚═══════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
+    echo ""
 }
 
-# Prompt with options
-prompt_choice() {
-    local prompt="$1"
+install_skills() {
+    local target_dir="$1"
     shift
-    local options=("$@")
+    local skills=("$@")
     
-    echo -e "\n${CYAN}${prompt}${NC}"
-    for i in "${!options[@]}"; do
-        echo -e "  ${YELLOW}[$((i+1))]${NC} ${options[$i]}"
-    done
-    echo -e "  ${YELLOW}[0]${NC} Skip"
+    mkdir -p "$target_dir/skills"
     
-    while true; do
-        read -p "$(echo -e ${BOLD}"> "${NC})" choice
-        if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 0 ] && [ "$choice" -le "${#options[@]}" ]; then
-            echo "$choice"
-            return
-        fi
-        echo -e "${RED}Invalid choice. Try again.${NC}"
-    done
-}
-
-# Get text input
-prompt_text() {
-    local prompt="$1"
-    local default="$2"
-    
-    if [ -n "$default" ]; then
-        read -p "$(echo -e ${CYAN}${prompt}${NC} [${default}]: )" value
-        echo "${value:-$default}"
-    else
-        read -p "$(echo -e ${CYAN}${prompt}${NC}: )" value
-        echo "$value"
-    fi
-}
-
-# Install a skill
-install_skill() {
-    local skill_id="$1"
-    local variant="$2"
-    local target_dir="$3"
-    
-    local skill_source="$SKILLS_DIR/$skill_id"
-    local skill_target="$target_dir/skills/$skill_id"
-    
-    if [ ! -d "$skill_source" ]; then
-        echo -e "${RED}Skill not found: $skill_id${NC}"
-        return 1
-    fi
-    
-    # Create target directory
-    mkdir -p "$skill_target"
-    
-    # Copy main SKILL.md
-    cp "$skill_source/SKILL.md" "$skill_target/"
-    
-    # Copy variant-specific reference
-    if [ -n "$variant" ] && [ -f "$skill_source/references/$variant.md" ]; then
-        mkdir -p "$skill_target/references"
-        cp "$skill_source/references/$variant.md" "$skill_target/references/"
-    fi
-    
-    # Copy scripts if they exist
-    if [ -d "$skill_source/scripts" ]; then
-        cp -r "$skill_source/scripts" "$skill_target/"
-    fi
-    
-    echo -e "${GREEN}✓ Installed: $skill_id ($variant)${NC}"
-    INSTALLED_SKILLS+=("$skill_id:$variant")
-}
-
-# Add environment variable
-add_env_var() {
-    local var_name="$1"
-    local description="$2"
-    ENV_VARS+=("$var_name=$description")
-}
-
-# Get credentials for a variant
-get_credentials() {
-    local skill_id="$1"
-    local variant="$2"
-    
-    # Read from registry
-    local creds=$(jq -r ".skills[] | select(.id==\"$skill_id\") | .requiredCredentials.$variant[]?" "$REGISTRY_FILE" 2>/dev/null)
-    
-    if [ -n "$creds" ]; then
-        while IFS= read -r cred; do
-            add_env_var "$cred" "Required for $skill_id ($variant)"
-        done <<< "$creds"
-    fi
-}
-
-# Main installation flow
-main() {
-    print_banner
-    
-    # Get client info
-    echo -e "${BOLD}Let's set up the agent for your client.${NC}\n"
-    
-    CLIENT_NAME=$(prompt_text "Client name")
-    WORKSPACE=$(prompt_text "Agent workspace path" "$HOME/clawd")
-    
-    # Validate workspace
-    if [ ! -d "$WORKSPACE" ]; then
-        echo -e "${YELLOW}Workspace doesn't exist. Create it? (y/n)${NC}"
-        read -p "> " create
-        if [ "$create" = "y" ]; then
-            mkdir -p "$WORKSPACE/skills"
-            echo -e "${GREEN}Created: $WORKSPACE${NC}"
+    for skill in "${skills[@]}"; do
+        if [ -d "$SKILLS_DIR/$skill" ]; then
+            cp -r "$SKILLS_DIR/$skill" "$target_dir/skills/"
+            echo -e "  ${GREEN}✓${NC} $skill"
         else
-            echo -e "${RED}Aborted.${NC}"
-            exit 1
+            echo -e "  ${YELLOW}⚠${NC} $skill (not found)"
         fi
-    fi
+    done
+}
+
+generate_env_template() {
+    local target_dir="$1"
+    shift
+    local skills=("$@")
     
-    mkdir -p "$WORKSPACE/skills"
+    local env_file="$target_dir/.env.template"
     
-    echo -e "\n${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BOLD}Select skills to install:${NC}"
-    echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    cat > "$env_file" << 'EOF'
+# ============================================
+# Deploy Your Agent - Environment Variables
+# ============================================
+# Fill in the values and rename to .env
+
+# Client Info
+CLIENT_NAME=
+CLIENT_EMAIL=
+
+EOF
+
+    # Add skill-specific env vars
+    for skill in "${skills[@]}"; do
+        case "$skill" in
+            "gog")
+                cat >> "$env_file" << 'EOF'
+# Google Workspace (gog)
+# Setup: gog auth credentials /path/to/client_secret.json
+# Then: gog auth add email@gmail.com --services gmail,calendar,drive
+
+EOF
+                ;;
+            "stripe")
+                cat >> "$env_file" << 'EOF'
+# Stripe
+STRIPE_API_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+EOF
+                ;;
+            "hubspot")
+                cat >> "$env_file" << 'EOF'
+# HubSpot
+HUBSPOT_API_KEY=pat-na1-...
+
+EOF
+                ;;
+            "openai"|"summarize"|"deep-research")
+                cat >> "$env_file" << 'EOF'
+# OpenAI (for summarize, research, etc.)
+OPENAI_API_KEY=sk-...
+
+EOF
+                ;;
+            "twitter")
+                cat >> "$env_file" << 'EOF'
+# Twitter/X
+TWITTER_API_KEY=
+TWITTER_API_SECRET=
+TWITTER_ACCESS_TOKEN=
+TWITTER_ACCESS_SECRET=
+
+EOF
+                ;;
+            "instagram")
+                cat >> "$env_file" << 'EOF'
+# Instagram
+INSTAGRAM_SESSION_ID=
+
+EOF
+                ;;
+            "n8n")
+                cat >> "$env_file" << 'EOF'
+# n8n Automation
+N8N_API_URL=http://localhost:5678
+N8N_API_KEY=
+
+EOF
+                ;;
+            "linear")
+                cat >> "$env_file" << 'EOF'
+# Linear
+LINEAR_API_KEY=lin_api_...
+
+EOF
+                ;;
+            "todoist")
+                cat >> "$env_file" << 'EOF'
+# Todoist
+TODOIST_API_KEY=
+
+EOF
+                ;;
+            "ga4-analytics")
+                cat >> "$env_file" << 'EOF'
+# Google Analytics
+GA4_PROPERTY_ID=
+# Uses same OAuth as gog
+
+EOF
+                ;;
+        esac
+    done
     
-    # Email Management
-    choice=$(prompt_choice "📧 EMAIL MANAGEMENT - Which provider?" "Gmail / Google Workspace" "Outlook / Microsoft 365" "Other (IMAP/SMTP)")
-    case $choice in
-        1) install_skill "email-management" "gmail" "$WORKSPACE"; get_credentials "email-management" "gmail" ;;
-        2) install_skill "email-management" "outlook" "$WORKSPACE"; get_credentials "email-management" "outlook" ;;
-        3) install_skill "email-management" "imap" "$WORKSPACE"; get_credentials "email-management" "imap" ;;
-    esac
-    
-    # Calendar
-    choice=$(prompt_choice "📅 CALENDAR - Which provider?" "Google Calendar" "Outlook Calendar")
-    case $choice in
-        1) install_skill "calendar" "google" "$WORKSPACE"; get_credentials "calendar" "google" ;;
-        2) install_skill "calendar" "outlook" "$WORKSPACE"; get_credentials "calendar" "outlook" ;;
-    esac
-    
-    # Customer Service
-    choice=$(prompt_choice "💬 CUSTOMER SERVICE - Which platform?" "Zendesk" "Freshdesk" "Email-only (no ticketing)")
-    case $choice in
-        1) install_skill "customer-service" "zendesk" "$WORKSPACE"; get_credentials "customer-service" "zendesk" ;;
-        2) install_skill "customer-service" "freshdesk" "$WORKSPACE"; get_credentials "customer-service" "freshdesk" ;;
-        3) install_skill "customer-service" "email" "$WORKSPACE"; get_credentials "customer-service" "email" ;;
-    esac
-    
-    # Invoicing
-    choice=$(prompt_choice "💰 INVOICING - Which system?" "Xero" "QuickBooks" "Generic (PDF invoices)")
-    case $choice in
-        1) install_skill "invoicing" "xero" "$WORKSPACE"; get_credentials "invoicing" "xero" ;;
-        2) install_skill "invoicing" "quickbooks" "$WORKSPACE"; get_credentials "invoicing" "quickbooks" ;;
-        3) install_skill "invoicing" "generic" "$WORKSPACE"; get_credentials "invoicing" "generic" ;;
-    esac
-    
-    # CRM
-    choice=$(prompt_choice "📊 CRM - Which platform?" "HubSpot" "Salesforce" "Deploy CRM (Supabase)")
-    case $choice in
-        1) install_skill "crm" "hubspot" "$WORKSPACE"; get_credentials "crm" "hubspot" ;;
-        2) install_skill "crm" "salesforce" "$WORKSPACE"; get_credentials "crm" "salesforce" ;;
-        3) install_skill "crm" "deploy-crm" "$WORKSPACE"; get_credentials "crm" "deploy-crm" ;;
-    esac
-    
-    # Inventory
-    choice=$(prompt_choice "📦 INVENTORY - Which platform?" "Shopify" "WooCommerce" "Generic (Spreadsheet)")
-    case $choice in
-        1) install_skill "inventory" "shopify" "$WORKSPACE"; get_credentials "inventory" "shopify" ;;
-        2) install_skill "inventory" "woocommerce" "$WORKSPACE"; get_credentials "inventory" "woocommerce" ;;
-        3) install_skill "inventory" "generic" "$WORKSPACE"; get_credentials "inventory" "generic" ;;
-    esac
-    
-    # Document Management
-    choice=$(prompt_choice "📁 DOCUMENT MANAGEMENT - Which platform?" "Google Drive" "OneDrive / SharePoint" "Dropbox")
-    case $choice in
-        1) install_skill "document-management" "google-drive" "$WORKSPACE"; get_credentials "document-management" "google-drive" ;;
-        2) install_skill "document-management" "onedrive" "$WORKSPACE"; get_credentials "document-management" "onedrive" ;;
-        3) install_skill "document-management" "dropbox" "$WORKSPACE"; get_credentials "document-management" "dropbox" ;;
-    esac
-    
-    # Generate .env.template
-    if [ ${#ENV_VARS[@]} -gt 0 ]; then
-        echo -e "\n${CYAN}Generating .env.template...${NC}"
-        ENV_FILE="$WORKSPACE/.env.template"
-        
-        echo "# Deploy Your Agent - Environment Variables" > "$ENV_FILE"
-        echo "# Client: $CLIENT_NAME" >> "$ENV_FILE"
-        echo "# Generated: $(date -Iseconds)" >> "$ENV_FILE"
-        echo "" >> "$ENV_FILE"
-        
-        current_section=""
-        for var in "${ENV_VARS[@]}"; do
-            var_name="${var%%=*}"
-            description="${var#*=}"
-            
-            # Add section headers based on variable prefix
-            section="${var_name%%_*}"
-            if [ "$section" != "$current_section" ]; then
-                echo "" >> "$ENV_FILE"
-                echo "# $section" >> "$ENV_FILE"
-                current_section="$section"
-            fi
-            
-            echo "$var_name=  # $description" >> "$ENV_FILE"
+    echo -e "\n${GREEN}✓${NC} Generated .env.template"
+}
+
+# ============================================
+# MAIN
+# ============================================
+
+print_banner
+
+# Get target directory
+echo -e "${CYAN}Where should we install the skills?${NC}"
+echo -e "  ${YELLOW}[1]${NC} Current directory (./skills)"
+echo -e "  ${YELLOW}[2]${NC} Custom path"
+echo ""
+read -p "$(echo -e ${BOLD}"> "${NC})" dir_choice
+
+case "$dir_choice" in
+    1)
+        TARGET_DIR="$(pwd)"
+        ;;
+    2)
+        read -p "Enter path: " TARGET_DIR
+        TARGET_DIR="${TARGET_DIR/#\~/$HOME}"
+        ;;
+    *)
+        TARGET_DIR="$(pwd)"
+        ;;
+esac
+
+mkdir -p "$TARGET_DIR"
+echo -e "\n${GREEN}Installing to:${NC} $TARGET_DIR\n"
+
+# Select business type
+echo -e "${CYAN}Select client business type:${NC}"
+echo -e "  ${YELLOW}[1]${NC} 🔧 Service Business (plumber, electrician, cleaner)"
+echo -e "  ${YELLOW}[2]${NC} 🛒 E-commerce (online store, dropshipping)"
+echo -e "  ${YELLOW}[3]${NC} 📊 Agency / Consulting"
+echo -e "  ${YELLOW}[4]${NC} 🎨 Content Creator"
+echo -e "  ${YELLOW}[5]${NC} 💼 Professional Services (lawyer, accountant)"
+echo -e "  ${YELLOW}[6]${NC} 📦 All Skills (41 skills)"
+echo -e "  ${YELLOW}[7]${NC} ⚙️  Custom Selection"
+echo ""
+read -p "$(echo -e ${BOLD}"> "${NC})" biz_choice
+
+# Combine core + business-specific skills
+INSTALL_SKILLS=("${CORE_SKILLS[@]}")
+
+case "$biz_choice" in
+    1)
+        INSTALL_SKILLS+=("${SERVICE_SKILLS[@]}")
+        BIZ_TYPE="Service Business"
+        ;;
+    2)
+        INSTALL_SKILLS+=("${ECOMMERCE_SKILLS[@]}")
+        BIZ_TYPE="E-commerce"
+        ;;
+    3)
+        INSTALL_SKILLS+=("${AGENCY_SKILLS[@]}")
+        BIZ_TYPE="Agency"
+        ;;
+    4)
+        INSTALL_SKILLS+=("${CREATOR_SKILLS[@]}")
+        BIZ_TYPE="Content Creator"
+        ;;
+    5)
+        INSTALL_SKILLS+=("${PROFESSIONAL_SKILLS[@]}")
+        BIZ_TYPE="Professional Services"
+        ;;
+    6)
+        INSTALL_SKILLS=("${ALL_SKILLS[@]}")
+        BIZ_TYPE="Full Install"
+        ;;
+    7)
+        echo -e "\n${CYAN}Available skills:${NC}"
+        for i in "${!ALL_SKILLS[@]}"; do
+            printf "  ${YELLOW}[%2d]${NC} %s\n" "$((i+1))" "${ALL_SKILLS[$i]}"
         done
-        
-        echo -e "${GREEN}✓ Created: $ENV_FILE${NC}"
-    fi
-    
-    # Generate installation log
-    LOG_DIR="$HOME/.deploy/clients"
-    mkdir -p "$LOG_DIR"
-    LOG_FILE="$LOG_DIR/$(echo "$CLIENT_NAME" | tr ' ' '-' | tr '[:upper:]' '[:lower:]').json"
-    
-    echo "{" > "$LOG_FILE"
-    echo "  \"client\": \"$CLIENT_NAME\"," >> "$LOG_FILE"
-    echo "  \"installed\": \"$(date -Iseconds)\"," >> "$LOG_FILE"
-    echo "  \"workspace\": \"$WORKSPACE\"," >> "$LOG_FILE"
-    echo "  \"skills\": {" >> "$LOG_FILE"
-    
-    first=true
-    for skill in "${INSTALLED_SKILLS[@]}"; do
-        skill_id="${skill%%:*}"
-        variant="${skill#*:}"
-        if [ "$first" = true ]; then
-            first=false
-        else
-            echo "," >> "$LOG_FILE"
-        fi
-        echo -n "    \"$skill_id\": { \"variant\": \"$variant\", \"version\": \"1.0.0\" }" >> "$LOG_FILE"
-    done
-    
-    echo "" >> "$LOG_FILE"
-    echo "  }" >> "$LOG_FILE"
-    echo "}" >> "$LOG_FILE"
-    
-    echo -e "${GREEN}✓ Installation logged: $LOG_FILE${NC}"
-    
-    # Summary
-    echo -e "\n${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BOLD}✅ Installation Complete!${NC}"
-    echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
-    echo -e "\n${BOLD}Installed ${#INSTALLED_SKILLS[@]} skills:${NC}"
-    for skill in "${INSTALLED_SKILLS[@]}"; do
-        skill_id="${skill%%:*}"
-        variant="${skill#*:}"
-        echo -e "  ${GREEN}•${NC} $skill_id ($variant)"
-    done
-    
-    echo -e "\n${BOLD}📝 Next steps:${NC}"
-    echo -e "  1. Fill in credentials: ${CYAN}$WORKSPACE/.env.template${NC}"
-    echo -e "  2. Rename to .env: ${CYAN}mv .env.template .env${NC}"
-    echo -e "  3. Restart agent: ${CYAN}clawdbot gateway restart${NC}"
-    echo -e "  4. Test each skill"
-    
-    echo -e "\n${GREEN}Happy deploying! 🚀${NC}\n"
-}
+        echo ""
+        echo -e "Enter skill numbers separated by spaces (e.g., 1 5 12 18):"
+        read -p "> " selections
+        INSTALL_SKILLS=("${CORE_SKILLS[@]}")
+        for num in $selections; do
+            idx=$((num-1))
+            if [ $idx -ge 0 ] && [ $idx -lt ${#ALL_SKILLS[@]} ]; then
+                INSTALL_SKILLS+=("${ALL_SKILLS[$idx]}")
+            fi
+        done
+        BIZ_TYPE="Custom"
+        ;;
+    *)
+        echo -e "${RED}Invalid choice${NC}"
+        exit 1
+        ;;
+esac
 
-# Run
-main "$@"
+# Remove duplicates
+INSTALL_SKILLS=($(echo "${INSTALL_SKILLS[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+
+echo -e "\n${PURPLE}═══════════════════════════════════════════════════════${NC}"
+echo -e "${BOLD}Installing ${#INSTALL_SKILLS[@]} skills for: $BIZ_TYPE${NC}"
+echo -e "${PURPLE}═══════════════════════════════════════════════════════${NC}\n"
+
+# Install skills
+install_skills "$TARGET_DIR" "${INSTALL_SKILLS[@]}"
+
+# Generate .env template
+echo ""
+generate_env_template "$TARGET_DIR" "${INSTALL_SKILLS[@]}"
+
+# Summary
+echo ""
+echo -e "${PURPLE}═══════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}${BOLD}✅ Installation Complete!${NC}"
+echo -e "${PURPLE}═══════════════════════════════════════════════════════${NC}"
+echo ""
+echo -e "Installed ${GREEN}${#INSTALL_SKILLS[@]}${NC} skills to: ${CYAN}$TARGET_DIR/skills/${NC}"
+echo ""
+echo -e "${YELLOW}Next steps:${NC}"
+echo "  1. Review .env.template and add credentials"
+echo "  2. Rename .env.template to .env"
+echo "  3. Set up OAuth for Google (gog auth credentials ...)"
+echo "  4. Test with: clawdbot skills list"
+echo ""
+echo -e "${PURPLE}Happy deploying! 🚀${NC}"
